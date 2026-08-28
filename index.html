@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TIENDA RIORISE - RMT-CUBARP</title>
+    <!-- Optimización de carga de fuentes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Inter:wght@500;700&family=Orbitron:wght@700;900&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
+    
     <style>
         :root {
             --bg-color: #080d1a;
@@ -197,8 +201,15 @@
             box-shadow: 0 0 8px var(--accent-blue-glow);
         }
 
+        .form-control:disabled {
+            opacity: 0.8;
+            cursor: not-allowed;
+        }
+
         select.form-control {
             appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a2b4d0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
             background-repeat: no-repeat;
             background-position: right 14px center;
@@ -266,6 +277,7 @@
             width: 22px;
             height: 22px;
             fill: currentColor;
+            flex-shrink: 0;
         }
     </style>
 </head>
@@ -284,8 +296,8 @@
         <p class="subtitle">CALCULADORA OFICIAL DE RECARGAS</p>
 
         <div class="mode-switch">
-            <button class="mode-btn buy active" id="btn-buy" onclick="setMode('buy')">COMPRAR</button>
-            <button class="mode-btn sell" id="btn-sell" onclick="setMode('sell')">VENDER</button>
+            <button class="mode-btn buy active" id="btn-buy" type="button" onclick="setMode('buy')">COMPRAR</button>
+            <button class="mode-btn sell" id="btn-sell" type="button" onclick="setMode('sell')">VENDER</button>
         </div>
 
         <div class="single-info-box">
@@ -300,8 +312,13 @@
         </div>
 
         <div class="form-group">
+            <label for="player-name">NOMBRE DE JUGADOR / ID:</label>
+            <input type="text" id="player-name" class="form-control" placeholder="Ej: Juan_Perez" autocomplete="off">
+        </div>
+
+        <div class="form-group">
             <label for="amount">CANTIDAD DE REALES:</label>
-            <input type="number" id="amount" class="form-control" value="10000" oninput="calculateTotal()">
+            <input type="number" id="amount" class="form-control" value="10000" min="0" step="1000" oninput="calculateTotal()">
         </div>
 
         <div class="form-group">
@@ -317,7 +334,7 @@
             <div class="total-amount" id="total-price">850 CUP</div>
         </div>
 
-        <button class="btn-whatsapp" id="btn-action" onclick="sendToWhatsApp()">
+        <button class="btn-whatsapp" id="btn-action" type="button" onclick="sendToWhatsApp()">
             <svg viewBox="0 0 24 24">
                 <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.762.459 3.48 1.332 5.001l-1.416 5.166 5.291-1.383c1.472.802 3.13 1.224 4.78 1.225h.004c5.505 0 9.988-4.478 9.989-9.985 0-2.668-1.038-5.176-2.924-7.062a9.92 9.92 0 0 0-7.066-2.946zm5.824 14.132c-.244.688-1.427 1.309-1.97 1.365-.506.052-1.168.232-3.826-.814-3.398-1.336-5.589-4.81-5.759-5.038-.17-.229-1.378-1.832-1.378-3.496 0-1.664.87-2.483 1.179-2.822.309-.339.673-.424.898-.424.225 0 .45.001.647.012.207.011.485-.079.758.577.283.678.96 2.343 1.043 2.513.083.17.139.37.027.593-.112.224-.168.363-.336.561-.168.198-.354.442-.505.594-.168.169-.344.354-.148.692.197.338.877 1.446 1.884 2.344 1.294 1.153 2.385 1.51 2.723 1.679.338.169.535.141.732-.085.197-.225.844-.984 1.069-1.322.225-.338.45-.282.759-.169.309.113 1.968.928 2.306 1.097.338.169.562.253.646.395.084.141.084.816-.16 1.504z"/>
             </svg>
@@ -331,7 +348,6 @@
         
         let currentMode = 'buy';
 
-        // Contactos para rotación aleatoria
         const contacts = [
             { name: "Jose_Navaza", phone: "5355679191" },
             { name: "Roly_Rdiaz", phone: "5351705159" }
@@ -341,7 +357,7 @@
         const buyRateUSDT = 0.80 / 10000;   
         const sellRateUSDT = 0.65 / 10000;  
 
-        // Tasas CUP (Transfermóvil)
+        // Tasas CUP
         const buyRateCUP = 850 / 10000;     
         const sellRateCUP = 600 / 10000;    
 
@@ -395,61 +411,66 @@
                 currencySymbol = 'USDT';
             }
 
-            document.getElementById('total-price').innerText = `${total.toFixed(2).replace('.', ',')} ${currencySymbol}`;
+            const formattedTotal = (currencySymbol === 'USDT') 
+                ? total.toFixed(2).replace('.', ',') 
+                : total.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+
+            document.getElementById('total-price').innerText = `${formattedTotal} ${currencySymbol}`;
         }
 
         function sendToWhatsApp() {
+            const playerNameInput = document.getElementById('player-name').value.trim();
+
+            if (!playerNameInput) {
+                alert('Por favor, ingresa tu Nombre de Jugador o ID antes de continuar.');
+                document.getElementById('player-name').focus();
+                return;
+            }
+
             const randomAdmin = contacts[Math.floor(Math.random() * contacts.length)];
-            
-            const amount = document.getElementById('amount').value;
+            const amount = document.getElementById('amount').value || '0';
             const payment = document.getElementById('payment').value;
             const total = document.getElementById('total-price').innerText;
             
-            let message = '';
+            let messageText = '';
 
-            // Mensaje personalizado según la operación y método seleccionado
             if (currentMode === 'buy') {
-                if (payment.includes('CUP')) {
-                    message = `¡Hola *${randomAdmin.name}*! Quisiera realizar una *ORDEN DE COMPRA* en *TIENDA RIORISE - RMT-CUBARP*:%0A%0A` +
-                              `🎮 *Juego:* ${selectedGame}%0A` +
-                              `🌐 *Servidor:* ${server}%0A` +
-                              `💎 *Cantidad deseada:* ${amount} REALES%0A` +
-                              `💳 *Método de pago:* Transfermóvil (CUP)%0A` +
-                              `💰 *Total a transferir:* ${total}%0A%0A` +
-                              `Por favor, facilítame el número de tarjeta/teléfono para realizar la transferencia.`;
-                } else {
-                    message = `¡Hola *${randomAdmin.name}*! Quisiera realizar una *ORDEN DE COMPRA* en *TIENDA RIORISE - RMT-CUBARP*:%0A%0A` +
-                              `🎮 *Juego:* ${selectedGame}%0A` +
-                              `🌐 *Servidor:* ${server}%0A` +
-                              `💎 *Cantidad deseada:* ${amount} REALES%0A` +
-                              `💳 *Método de pago:* USDT (Cripto)%0A` +
-                              `💰 *Total a pagar:* ${total}%0A%0A` +
-                              `Por favor, envíame la dirección de la billetera (Network/Red) para efectuar el pago.`;
-                }
-            } else { // Modo VENTA
-                if (payment.includes('CUP')) {
-                    message = `¡Hola *${randomAdmin.name}*! Quisiera realizar una *ORDEN DE VENTA* en *TIENDA RIORISE - RMT-CUBARP*:%0A%0A` +
-                              `🎮 *Juego:* ${selectedGame}%0A` +
-                              `🌐 *Servidor:* ${server}%0A` +
-                              `💎 *Cantidad a entregar:* ${amount} REALES%0A` +
-                              `💳 *Método de cobro:* Transfermóvil (CUP)%0A` +
-                              `💰 *Total a recibir:* ${total}%0A%0A` +
-                              `Por favor, confirmame para darte los datos dentro del juego y enviar mi tarjeta para el pago.`;
-                } else {
-                    message = `¡Hola *${randomAdmin.name}*! Quisiera realizar una *ORDEN DE VENTA* en *TIENDA RIORISE - RMT-CUBARP*:%0A%0A` +
-                              `🎮 *Juego:* ${selectedGame}%0A` +
-                              `🌐 *Servidor:* ${server}%0A` +
-                              `💎 *Cantidad a entregar:* ${amount} REALES%0A` +
-                              `💳 *Método de cobro:* USDT (Cripto)%0A` +
-                              `💰 *Total a recibir:* ${total}%0A%0A` +
-                              `Por favor, confirmame para darte los datos dentro del juego y pasarte mi wallet USDT.`;
-                }
+                const metodoPago = payment.includes('CUP') ? 'Transfermóvil (CUP)' : 'USDT (Cripto)';
+                const detallePago = payment.includes('CUP') 
+                    ? 'Por favor, facilítame el número de tarjeta/teléfono para realizar la transferencia.' 
+                    : 'Por favor, envíame la dirección de la billetera (Red/Network) para efectuar el pago.';
+
+                messageText = `🛒 *NUEVA ORDEN DE COMPRA*\n` +
+                              `🏛️ *Tienda:* TIENDA RIORISE - RMT-CUBARP\n\n` +
+                              `🎮 *Juego:* ${selectedGame}\n` +
+                              `🌐 *Servidor:* ${server}\n` +
+                              `👤 *Jugador / ID:* ${playerNameInput}\n` +
+                              `💎 *Cantidad a Comprar:* ${amount} REALES\n` +
+                              `💳 *Método de Pago:* ${metodoPago}\n` +
+                              `💰 *Total a pagar:* ${total}\n\n` +
+                              `Hola *${randomAdmin.name}*, ${detallePago}`;
+            } else {
+                const metodoCobro = payment.includes('CUP') ? 'Transfermóvil (CUP)' : 'USDT (Cripto)';
+                const detalleCobro = payment.includes('CUP') 
+                    ? 'Por favor, confírmame para coordinar en el juego y enviarte mi tarjeta.' 
+                    : 'Por favor, confírmame para coordinar en el juego y enviarte mi wallet USDT.';
+
+                messageText = `🤝 *NUEVA ORDEN DE VENTA*\n` +
+                              `🏛️ *Tienda:* TIENDA RIORISE - RMT-CUBARP\n\n` +
+                              `🎮 *Juego:* ${selectedGame}\n` +
+                              `🌐 *Servidor:* ${server}\n` +
+                              `👤 *Jugador / ID:* ${playerNameInput}\n` +
+                              `💎 *Cantidad a Vender:* ${amount} REALES\n` +
+                              `💳 *Método de Cobro:* ${metodoCobro}\n` +
+                              `💰 *Total a recibir:* ${total}\n\n` +
+                              `Hola *${randomAdmin.name}*, ${detalleCobro}`;
             }
 
-            window.open(`https://wa.me/${randomAdmin.phone}?text=${message}`, '_blank');
+            const encodedMessage = encodeURIComponent(messageText);
+            window.open(`https://wa.me/${randomAdmin.phone}?text=${encodedMessage}`, '_blank');
         }
 
-        calculateTotal();
+        document.addEventListener('DOMContentLoaded', calculateTotal);
     </script>
 </body>
 </html>
