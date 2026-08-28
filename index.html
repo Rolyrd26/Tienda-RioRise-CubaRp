@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TIENDA RIORISE - RMT-CUBARP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Inter:wght@500;700&family=Orbitron:wght@700;900&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #080d1a;
+            --card-bg: #10192e;
+            --input-bg: #182542;
+            --accent-red: #ff2a4b;
+            --accent-red-glow: rgba(255, 42, 75, 0.4);
+            --accent-green: #00ff66;
+            --accent-green-glow: rgba(0, 255, 102, 0.4);
+            --accent-blue: #0088ff;
+            --accent-blue-glow: rgba(0, 136, 255, 0.4);
+            --text-white: #ffffff;
+            --text-gray: #a2b4d0;
+            --border-color: #24365d;
+            
+            --action-color: var(--accent-red);
+            --action-glow: var(--accent-red-glow);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-white);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 10px;
+            background-image: linear-gradient(rgba(0, 136, 255, 0.04) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0, 136, 255, 0.04) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 28px 22px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 136, 255, 0.1);
+            text-align: center;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 136, 255, 0.12);
+            border: 1px solid var(--accent-blue);
+            color: var(--accent-blue);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 800;
+            padding: 4px 14px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 14px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-blue);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent-blue);
+        }
+
+        .title {
+            font-family: 'Cinzel Decorative', 'Orbitron', serif;
+            font-size: 1.6rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+            color: var(--text-white);
+            text-transform: uppercase;
+            line-height: 1.2;
+        }
+
+        .title span {
+            display: block;
+            color: var(--accent-blue);
+            text-shadow: 0 0 14px var(--accent-blue-glow);
+            margin-top: 4px;
+        }
+
+        .subtitle {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.85rem;
+            color: var(--text-gray);
+            letter-spacing: 2px;
+            font-weight: 700;
+            margin-bottom: 22px;
+            text-transform: uppercase;
+        }
+
+        .mode-switch {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 18px;
+            background-color: #0b1222;
+            padding: 5px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .mode-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-gray);
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 800;
+            font-size: 1.05rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .mode-btn.buy.active {
+            background-color: var(--accent-red);
+            color: var(--text-white);
+            box-shadow: 0 0 12px var(--accent-red-glow);
+        }
+
+        .mode-btn.sell.active {
+            background-color: var(--accent-green);
+            color: #000000;
+            box-shadow: 0 0 12px var(--accent-green-glow);
+        }
+
+        .single-info-box {
+            background-color: rgba(0, 136, 255, 0.12);
+            border: 1px solid var(--accent-blue);
+            color: var(--text-white);
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 0 10px var(--accent-blue-glow);
+            letter-spacing: 1.5px;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--text-gray);
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .form-control {
+            width: 100%;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px;
+            color: var(--text-white);
+            font-size: 1.05rem;
+            font-weight: 700;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 8px var(--accent-blue-glow);
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a2b4d0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 16px;
+            cursor: pointer;
+        }
+
+        .total-box {
+            background-color: #0b1222;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 18px;
+            margin-top: 24px;
+            margin-bottom: 22px;
+        }
+
+        .total-label {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.85rem;
+            color: var(--text-gray);
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            margin-bottom: 6px;
+        }
+
+        .total-amount {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--text-white);
+            text-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+            letter-spacing: 1px;
+        }
+
+        .btn-whatsapp {
+            width: 100%;
+            background-color: var(--action-color);
+            color: var(--text-white);
+            border: none;
+            border-radius: 10px;
+            padding: 16px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 20px var(--action-glow);
+            transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+        }
+
+        .btn-whatsapp.vender-mode {
+            color: #000000;
+        }
+
+        .btn-whatsapp:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.15);
+        }
+
+        .btn-whatsapp svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="status-badge">
+            <span class="status-dot"></span>
+            OFFICIAL STORE 24/7
+        </div>
+
+        <h1 class="title">
+            TIENDA RIORISE
+            <span>RMT-CUBARP</span>
+        </h1>
+        <p class="subtitle">CALCULADORA OFICIAL DE RECARGAS</p>
+
+        <div class="mode-switch">
+            <button class="mode-btn buy active" id="btn-buy" onclick="setMode('buy')">COMPRAR</button>
+            <button class="mode-btn sell" id="btn-sell" onclick="setMode('sell')">VENDER</button>
+        </div>
+
+        <div class="single-info-box">
+            🎮 RÍO RISE
+        </div>
+
+        <div class="form-group">
+            <label for="server">SERVIDOR:</label>
+            <select id="server" class="form-control" disabled>
+                <option value="LATAM #5">LATAM #5</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="amount">CANTIDAD DE REALES:</label>
+            <input type="number" id="amount" class="form-control" value="10000" oninput="calculateTotal()">
+        </div>
+
+        <div class="form-group">
+            <label for="payment">MÉTODO DE PAGO:</label>
+            <select id="payment" class="form-control" onchange="calculateTotal()">
+                <option value="TRANSFERMÓVIL (CUP)">TRANSFERMÓVIL (CUP)</option>
+                <option value="USDT (CRIPTO)">USDT (CRIPTO)</option>
+            </select>
+        </div>
+
+        <div class="total-box">
+            <div class="total-label" id="total-label-text">TOTAL A PAGAR</div>
+            <div class="total-amount" id="total-price">850 CUP</div>
+        </div>
+
+        <button class="btn-whatsapp" id="btn-action" onclick="sendToWhatsApp()">
+            <svg viewBox="0 0 24 24">
+                <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.762.459 3.48 1.332 5.001l-1.416 5.166 5.291-1.383c1.472.802 3.13 1.224 4.78 1.225h.004c5.505 0 9.988-4.478 9.989-9.985 0-2.668-1.038-5.176-2.924-7.062a9.92 9.92 0 0 0-7.066-2.946zm5.824 14.132c-.244.688-1.427 1.309-1.97 1.365-.506.052-1.168.232-3.826-.814-3.398-1.336-5.589-4.81-5.759-5.038-.17-.229-1.378-1.832-1.378-3.496 0-1.664.87-2.483 1.179-2.822.309-.339.673-.424.898-.424.225 0 .45.001.647.012.207.011.485-.079.758.577.283.678.96 2.343 1.043 2.513.083.17.139.37.027.593-.112.224-.168.363-.336.561-.168.198-.354.442-.505.594-.168.169-.344.354-.148.692.197.338.877 1.446 1.884 2.344 1.294 1.153 2.385 1.51 2.723 1.679.338.169.535.141.732-.085.197-.225.844-.984 1.069-1.322.225-.338.45-.282.759-.169.309.113 1.968.928 2.306 1.097.338.169.562.253.646.395.084.141.084.816-.16 1.504z"/>
+            </svg>
+            <span id="btn-text">COMPRAR POR WHATSAPP</span>
+        </button>
+    </div>
+
+    <script>
+        const selectedGame = 'RÍO RISE';
+        const server = 'LATAM #5';
+        
+        let currentMode = 'buy';
+
+        // Contactos para rotación aleatoria
+        const contacts = [
+            { name: "Jose_Navaza", phone: "5355679191" },
+            { name: "Roly_Rdiaz", phone: "5351705159" }
+        ];
+
+        // Tasas USDT
+        const buyRateUSDT = 0.80 / 10000;   
+        const sellRateUSDT = 0.65 / 10000;  
+
+        // Tasas CUP (Transfermóvil)
+        const buyRateCUP = 850 / 10000;     
+        const sellRateCUP = 600 / 10000;    
+
+        function setMode(mode) {
+            currentMode = mode;
+            const btnBuy = document.getElementById('btn-buy');
+            const btnSell = document.getElementById('btn-sell');
+            const btnAction = document.getElementById('btn-action');
+            const btnText = document.getElementById('btn-text');
+            const totalLabel = document.getElementById('total-label-text');
+
+            if (mode === 'buy') {
+                btnBuy.classList.add('active');
+                btnSell.classList.remove('active');
+                btnAction.classList.remove('vender-mode');
+                
+                document.documentElement.style.setProperty('--action-color', 'var(--accent-red)');
+                document.documentElement.style.setProperty('--action-glow', 'var(--accent-red-glow)');
+                
+                btnText.innerText = 'COMPRAR POR WHATSAPP';
+                totalLabel.innerText = 'TOTAL A PAGAR';
+            } else {
+                btnSell.classList.add('active');
+                btnBuy.classList.remove('active');
+                btnAction.classList.add('vender-mode');
+                
+                document.documentElement.style.setProperty('--action-color', 'var(--accent-green)');
+                document.documentElement.style.setProperty('--action-glow', 'var(--accent-green-glow)');
+                
+                btnText.innerText = 'VENDER POR WHATSAPP';
+                totalLabel.innerText = 'TOTAL A RECIBIR';
+            }
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            const amountInput = document.getElementById('amount').value;
+            const amount = parseFloat(amountInput) || 0;
+            const paymentMethod = document.getElementById('payment').value;
+            
+            let total = 0;
+            let currencySymbol = 'USDT';
+
+            if (paymentMethod.includes('CUP')) {
+                const activeRate = (currentMode === 'buy') ? buyRateCUP : sellRateCUP;
+                total = amount * activeRate;
+                currencySymbol = 'CUP';
+            } else {
+                const activeRate = (currentMode === 'buy') ? buyRateUSDT : sellRateUSDT;
+                total = amount * activeRate;
+                currencySymbol = 'USDT';
+            }
+
+            document.getElementById('total-price').innerText = `${total.toFixed(2).replace('.', ',')} ${currencySymbol}`;
+        }
+
+        function sendToWhatsApp() {
+            const randomAdmin = contacts[Math.floor(Math.random() * contacts.length)];
+            
+            const amount = document.getElementById('amount').value;
+            const payment = document.getElementById('payment').value;
+            const total = document.getElementById('total-price').innerText;
+            
+            let message = '';
+
+            // Mensaje personalizado según la operación y método seleccionado
+            if (currentMode === 'buy') {
+                if (payment.includes('CUP')) {
+                    message = `¡Hola *${randomAdmin.name}*! Quisiera realizar una *ORDEN DE COMPRA* en *TIENDA RIORISE - RMT-CUBARP*:%0A%0A` +
+                              `🎮 *Juego:* ${selectedGame}%0A` +
+                              `🌐 *Servidor:* ${server}%0A` +
+                              `💎 *Cantidad deseada:* ${amount} REALES%0A` +
+                              `💳 *Método de pago:* Transfermóvil (CUP)%0A` +
+                              `💰 *Total a transferir:* ${total}%0A%0A` +
+                              `Por favor, facilítame el número de tarjeta/teléfono para realizar la transferencia.`;
+                } else {
+                    message = `¡Hola *${randomAdmin.name}*! Quisiera realizar una *ORDEN DE COMPRA* en *TIENDA RIORISE - RMT-CUBARP*:%0A%0A` +
+                              `🎮 *Juego:* ${selectedGame}%0A` +
+                              `🌐 *Servidor:* ${server}%0A` +
+                              `💎 *Cantidad deseada:* ${amount} REALES%0A` +
+                              `💳 *Método de pago:* USDT (Cripto)%0A` +
+                              `💰 *Total a pagar:* ${total}%0A%0A` +
+                              `Por favor, envíame la dirección de la billetera (Network/Red) para efectuar el pago.`;
+                }
+            } else { // Modo VENTA
+                if (payment.includes('CUP')) {
+                    message = `¡Hola *${randomAdmin.name}*! Quisiera realizar una *ORDEN DE VENTA* en *TIENDA RIORISE - RMT-CUBARP*:%0A%0A` +
+                              `🎮 *Juego:* ${selectedGame}%0A` +
+                              `🌐 *Servidor:* ${server}%0A` +
+                              `💎 *Cantidad a entregar:* ${amount} REALES%0A` +
+                              `💳 *Método de cobro:* Transfermóvil (CUP)%0A` +
+                              `💰 *Total a recibir:* ${total}%0A%0A` +
+                              `Por favor, confirmame para darte los datos dentro del juego y enviar mi tarjeta para el pago.`;
+                } else {
+                    message = `¡Hola *${randomAdmin.name}*! Quisiera realizar una *ORDEN DE VENTA* en *TIENDA RIORISE - RMT-CUBARP*:%0A%0A` +
+                              `🎮 *Juego:* ${selectedGame}%0A` +
+                              `🌐 *Servidor:* ${server}%0A` +
+                              `💎 *Cantidad a entregar:* ${amount} REALES%0A` +
+                              `💳 *Método de cobro:* USDT (Cripto)%0A` +
+                              `💰 *Total a recibir:* ${total}%0A%0A` +
+                              `Por favor, confirmame para darte los datos dentro del juego y pasarte mi wallet USDT.`;
+                }
+            }
+
+            window.open(`https://wa.me/${randomAdmin.phone}?text=${message}`, '_blank');
+        }
+
+        calculateTotal();
+    </script>
+</body>
+</html>
