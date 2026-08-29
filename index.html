@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TIENDA RIORISE - RMT-CUBARP</title>
-    <!-- Optimización de carga de fuentes -->
+    <!-- Fuentes optimizadas -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Inter:wght@500;700&family=Orbitron:wght@700;900&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
@@ -42,7 +42,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 20px 10px;
+            padding: 20px 15px;
             background-image: linear-gradient(rgba(0, 136, 255, 0.04) 1px, transparent 1px),
                               linear-gradient(90deg, rgba(0, 136, 255, 0.04) 1px, transparent 1px);
             background-size: 30px 30px;
@@ -50,13 +50,26 @@
 
         .container {
             width: 100%;
-            max-width: 420px;
+            max-width: 440px;
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
+            border-radius: 18px;
             padding: 28px 22px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 136, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 136, 255, 0.1);
             text-align: center;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .main-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .header-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .status-badge {
@@ -121,6 +134,7 @@
             padding: 5px;
             border-radius: 10px;
             border: 1px solid var(--border-color);
+            width: 100%;
         }
 
         .mode-btn {
@@ -165,11 +179,42 @@
             gap: 8px;
             box-shadow: 0 0 10px var(--accent-blue-glow);
             letter-spacing: 1.5px;
+            width: 100%;
+        }
+
+        .stock-info-box {
+            background-color: rgba(0, 255, 102, 0.08);
+            border: 1px solid var(--accent-green);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .stock-label {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--text-gray);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .stock-amount {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--accent-green);
+            text-shadow: 0 0 8px var(--accent-green-glow);
         }
 
         .form-group {
             text-align: left;
             margin-bottom: 18px;
+            width: 100%;
         }
 
         .form-group label {
@@ -222,8 +267,9 @@
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 18px;
-            margin-top: 24px;
+            margin-top: 10px;
             margin-bottom: 22px;
+            width: 100%;
         }
 
         .total-label {
@@ -279,67 +325,139 @@
             fill: currentColor;
             flex-shrink: 0;
         }
+
+        /* VISTA ESCRITORIO AUTOMÁTICA O POR MODO DE NAVEGADOR */
+        @media screen and (min-width: 768px) {
+            .container {
+                max-width: 850px !important;
+                padding: 40px 35px;
+            }
+
+            .main-layout {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr;
+                gap: 35px;
+                text-align: left;
+                align-items: start;
+            }
+
+            .left-column {
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                height: 100%;
+            }
+
+            .right-column {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .header-section {
+                align-items: flex-start;
+            }
+
+            .title {
+                font-size: 1.8rem;
+            }
+
+            .subtitle {
+                margin-bottom: 28px;
+            }
+
+            .stock-info-box {
+                margin-top: auto;
+                padding: 18px 16px;
+            }
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div class="status-badge">
-            <span class="status-dot"></span>
-            OFFICIAL STORE 24/7
+        <div class="main-layout">
+            
+            <!-- COLUMNA IZQUIERDA -->
+            <div class="left-column">
+                <div class="header-section">
+                    <div class="status-badge">
+                        <span class="status-dot"></span>
+                        OFFICIAL STORE 24/7
+                    </div>
+
+                    <h1 class="title">
+                        TIENDA RIORISE
+                        <span>RMT-CUBARP</span>
+                    </h1>
+                    <p class="subtitle">CALCULADORA OFICIAL DE RECARGAS</p>
+                </div>
+
+                <div class="single-info-box">
+                    🎮 RÍO RISE
+                </div>
+
+                <!-- VENDEDOR INTERCAMBIADO: AHORA POR ENCIMA DE SERVIDOR -->
+                <div class="form-group">
+                    <label for="admin-select">ATENDIDO POR / VENDEDOR:</label>
+                    <select id="admin-select" class="form-control" onchange="updateStockDisplay()">
+                        <option value="5355679191|Jose_Navaza">Jose_Navaza</option>
+                        <option value="5351705159|Roly_Rdiaz">Roly_Rdiaz</option>
+                    </select>
+                </div>
+
+                <!-- SERVIDOR INTERCAMBIADO: AHORA DEBAJO DE VENDEDOR -->
+                <div class="form-group">
+                    <label for="server">SERVIDOR:</label>
+                    <select id="server" class="form-control" disabled>
+                        <option value="LATAM #5">LATAM #5</option>
+                    </select>
+                </div>
+
+                <div class="stock-info-box">
+                    <span class="stock-label" id="stock-label-display">Disponibles en Stock:</span>
+                    <span class="stock-amount" id="stock-display">0 REALES</span>
+                </div>
+            </div>
+
+            <!-- COLUMNA DERECHA -->
+            <div class="right-column">
+                <div class="mode-switch">
+                    <button class="mode-btn buy active" id="btn-buy" type="button" onclick="setMode('buy')">COMPRAR</button>
+                    <button class="mode-btn sell" id="btn-sell" type="button" onclick="setMode('sell')">VENDER</button>
+                </div>
+
+                <div class="form-group">
+                    <label for="player-name">NOMBRE DE JUGADOR / ID:</label>
+                    <input type="text" id="player-name" class="form-control" placeholder="Ej: Juan_Perez" autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label for="amount">CANTIDAD DE REALES:</label>
+                    <input type="number" id="amount" class="form-control" value="10000" min="0" step="1000" oninput="calculateTotal()">
+                </div>
+
+                <div class="form-group">
+                    <label for="payment">MÉTODO DE PAGO:</label>
+                    <select id="payment" class="form-control" onchange="calculateTotal()">
+                        <option value="TRANSFERMÓVIL (CUP)">TRANSFERMÓVIL (CUP)</option>
+                        <option value="USDT (CRIPTO)">USDT (CRIPTO)</option>
+                    </select>
+                </div>
+
+                <div class="total-box">
+                    <div class="total-label" id="total-label-text">TOTAL A PAGAR</div>
+                    <div class="total-amount" id="total-price">850 CUP</div>
+                </div>
+
+                <button class="btn-whatsapp" id="btn-action" type="button" onclick="sendToWhatsApp()">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.762.459 3.48 1.332 5.001l-1.416 5.166 5.291-1.383c1.472.802 3.13 1.224 4.78 1.225h.004c5.505 0 9.988-4.478 9.989-9.985 0-2.668-1.038-5.176-2.924-7.062a9.92 9.92 0 0 0-7.066-2.946zm5.824 14.132c-.244.688-1.427 1.309-1.97 1.365-.506.052-1.168.232-3.826-.814-3.398-1.336-5.589-4.81-5.759-5.038-.17-.229-1.378-1.832-1.378-3.496 0-1.664.87-2.483 1.179-2.822.309-.339.673-.424.898-.424.225 0 .45.001.647.012.207.011.485-.079.758.577.283.678.96 2.343 1.043 2.513.083.17.139.37.027.593-.112.224-.168.363-.336.561-.168.198-.354.442-.505.594-.168.169-.344.354-.148.692.197.338.877 1.446 1.884 2.344 1.294 1.153 2.385 1.51 2.723 1.679.338.169.535.141.732-.085.197-.225.844-.984 1.069-1.322.225-.338.45-.282.759-.169.309.113 1.968.928 2.306 1.097.338.169.562.253.646.395.084.141.084.816-.16 1.504z"/>
+                    </svg>
+                    <span id="btn-text">COMPRAR POR WHATSAPP</span>
+                </button>
+            </div>
+
         </div>
-
-        <h1 class="title">
-            TIENDA RIORISE
-            <span>RMT-CUBARP</span>
-        </h1>
-        <p class="subtitle">CALCULADORA OFICIAL DE RECARGAS</p>
-
-        <div class="mode-switch">
-            <button class="mode-btn buy active" id="btn-buy" type="button" onclick="setMode('buy')">COMPRAR</button>
-            <button class="mode-btn sell" id="btn-sell" type="button" onclick="setMode('sell')">VENDER</button>
-        </div>
-
-        <div class="single-info-box">
-            🎮 RÍO RISE
-        </div>
-
-        <div class="form-group">
-            <label for="server">SERVIDOR:</label>
-            <select id="server" class="form-control" disabled>
-                <option value="LATAM #5">LATAM #5</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="player-name">NOMBRE DE JUGADOR / ID:</label>
-            <input type="text" id="player-name" class="form-control" placeholder="Ej: Juan_Perez" autocomplete="off">
-        </div>
-
-        <div class="form-group">
-            <label for="amount">CANTIDAD DE REALES:</label>
-            <input type="number" id="amount" class="form-control" value="10000" min="0" step="1000" oninput="calculateTotal()">
-        </div>
-
-        <div class="form-group">
-            <label for="payment">MÉTODO DE PAGO:</label>
-            <select id="payment" class="form-control" onchange="calculateTotal()">
-                <option value="TRANSFERMÓVIL (CUP)">TRANSFERMÓVIL (CUP)</option>
-                <option value="USDT (CRIPTO)">USDT (CRIPTO)</option>
-            </select>
-        </div>
-
-        <div class="total-box">
-            <div class="total-label" id="total-label-text">TOTAL A PAGAR</div>
-            <div class="total-amount" id="total-price">850 CUP</div>
-        </div>
-
-        <button class="btn-whatsapp" id="btn-action" type="button" onclick="sendToWhatsApp()">
-            <svg viewBox="0 0 24 24">
-                <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.762.459 3.48 1.332 5.001l-1.416 5.166 5.291-1.383c1.472.802 3.13 1.224 4.78 1.225h.004c5.505 0 9.988-4.478 9.989-9.985 0-2.668-1.038-5.176-2.924-7.062a9.92 9.92 0 0 0-7.066-2.946zm5.824 14.132c-.244.688-1.427 1.309-1.97 1.365-.506.052-1.168.232-3.826-.814-3.398-1.336-5.589-4.81-5.759-5.038-.17-.229-1.378-1.832-1.378-3.496 0-1.664.87-2.483 1.179-2.822.309-.339.673-.424.898-.424.225 0 .45.001.647.012.207.011.485-.079.758.577.283.678.96 2.343 1.043 2.513.083.17.139.37.027.593-.112.224-.168.363-.336.561-.168.198-.354.442-.505.594-.168.169-.344.354-.148.692.197.338.877 1.446 1.884 2.344 1.294 1.153 2.385 1.51 2.723 1.679.338.169.535.141.732-.085.197-.225.844-.984 1.069-1.322.225-.338.45-.282.759-.169.309.113 1.968.928 2.306 1.097.338.169.562.253.646.395.084.141.084.816-.16 1.504z"/>
-            </svg>
-            <span id="btn-text">COMPRAR POR WHATSAPP</span>
-        </button>
     </div>
 
     <script>
@@ -348,10 +466,17 @@
         
         let currentMode = 'buy';
 
-        const contacts = [
-            { name: "Jose_Navaza", phone: "5355679191" },
-            { name: "Roly_Rdiaz", phone: "5351705159" }
-        ];
+        // STOCK Y DEMANDA DE REALES POR VENDEDOR
+        const vendorData = {
+            "Jose_Navaza": {
+                stockVenta: 150000,
+                comprasDeseadas: 30000
+            },
+            "Roly_Rdiaz": {
+                stockVenta: 200000,
+                comprasDeseadas: 100000
+            }
+        };
 
         // Tasas USDT
         const buyRateUSDT = 0.80 / 10000;   
@@ -360,6 +485,23 @@
         // Tasas CUP
         const buyRateCUP = 850 / 10000;     
         const sellRateCUP = 600 / 10000;    
+
+        function updateStockDisplay() {
+            const adminSelect = document.getElementById('admin-select').value;
+            const selectedName = adminSelect.split('|')[1];
+            const data = vendorData[selectedName] || { stockVenta: 0, comprasDeseadas: 0 };
+
+            const labelDisplay = document.getElementById('stock-label-display');
+            const amountDisplay = document.getElementById('stock-display');
+
+            if (currentMode === 'buy') {
+                labelDisplay.innerText = 'Disponibles en Stock:';
+                amountDisplay.innerText = `${data.stockVenta.toLocaleString('es-ES')} REALES`;
+            } else {
+                labelDisplay.innerText = 'Comprando hasta:';
+                amountDisplay.innerText = `${data.comprasDeseadas.toLocaleString('es-ES')} REALES`;
+            }
+        }
 
         function setMode(mode) {
             currentMode = mode;
@@ -390,6 +532,8 @@
                 btnText.innerText = 'VENDER POR WHATSAPP';
                 totalLabel.innerText = 'TOTAL A RECIBIR';
             }
+            
+            updateStockDisplay();
             calculateTotal();
         }
 
@@ -427,11 +571,26 @@
                 return;
             }
 
-            const randomAdmin = contacts[Math.floor(Math.random() * contacts.length)];
-            const amount = document.getElementById('amount').value || '0';
+            const adminSelect = document.getElementById('admin-select').value;
+            const adminData = adminSelect.split('|');
+            const selectedPhone = adminData[0];
+            const selectedName = adminData[1];
+
+            const amount = parseFloat(document.getElementById('amount').value) || 0;
             const payment = document.getElementById('payment').value;
-            const total = document.getElementById('total-price').innerText;
-            
+            const totalText = document.getElementById('total-price').innerText;
+            const data = vendorData[selectedName] || { stockVenta: 0, comprasDeseadas: 0 };
+
+            if (currentMode === 'buy' && amount > data.stockVenta) {
+                alert(`El vendedor ${selectedName} solo tiene ${data.stockVenta.toLocaleString('es-ES')} REALES disponibles para vender.`);
+                return;
+            }
+
+            if (currentMode === 'sell' && amount > data.comprasDeseadas) {
+                alert(`En este momento ${selectedName} solo está comprando hasta ${data.comprasDeseadas.toLocaleString('es-ES')} REALES.`);
+                return;
+            }
+
             let messageText = '';
 
             if (currentMode === 'buy') {
@@ -447,8 +606,8 @@
                               `👤 *Jugador / ID:* ${playerNameInput}\n` +
                               `💎 *Cantidad a Comprar:* ${amount} REALES\n` +
                               `💳 *Método de Pago:* ${metodoPago}\n` +
-                              `💰 *Total a pagar:* ${total}\n\n` +
-                              `Hola *${randomAdmin.name}*, ${detallePago}`;
+                              `💰 *Total a pagar:* ${totalText}\n\n` +
+                              `Hola *${selectedName}*, ${detallePago}`;
             } else {
                 const metodoCobro = payment.includes('CUP') ? 'Transfermóvil (CUP)' : 'USDT (Cripto)';
                 const detalleCobro = payment.includes('CUP') 
@@ -462,15 +621,18 @@
                               `👤 *Jugador / ID:* ${playerNameInput}\n` +
                               `💎 *Cantidad a Vender:* ${amount} REALES\n` +
                               `💳 *Método de Cobro:* ${metodoCobro}\n` +
-                              `💰 *Total a recibir:* ${total}\n\n` +
-                              `Hola *${randomAdmin.name}*, ${detalleCobro}`;
+                              `💰 *Total a recibir:* ${totalText}\n\n` +
+                              `Hola *${selectedName}*, ${detalleCobro}`;
             }
 
             const encodedMessage = encodeURIComponent(messageText);
-            window.open(`https://wa.me/${randomAdmin.phone}?text=${encodedMessage}`, '_blank');
+            window.open(`https://wa.me/${selectedPhone}?text=${encodedMessage}`, '_blank');
         }
 
-        document.addEventListener('DOMContentLoaded', calculateTotal);
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStockDisplay();
+            calculateTotal();
+        });
     </script>
 </body>
 </html>
