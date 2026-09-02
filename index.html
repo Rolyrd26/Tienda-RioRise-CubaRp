@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TIENDA RIORISE - RMT-CUBARP</title>
+    <title>CubaStoreRMT</title>
 
     <!-- LOGO EN LA PESTAÑA DEL NAVEGADOR (FAVICON) -->
     <link rel="icon" href="./cubastore.png" type="image/png" />
@@ -11,7 +11,7 @@
 
     <!-- LOGO AL COMPARTIR EL LINK EN REDES SOCIALES / WHATSAPP -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="TIENDA RIORISE - RMT-CUBARP" />
+    <meta property="og:title" content="CubaStoreRMT" />
     <meta property="og:description" content="Calculadora Oficial de Recargas para Río Rise." />
     <meta property="og:image" content="https://cubarp-tiendariorise-rmt.netlify.app/cubastore.png" />
     <meta property="og:image:type" content="image/png" />
@@ -19,7 +19,7 @@
 
     <!-- TARJETA PARA X / TWITTER -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="TIENDA RIORISE - RMT-CUBARP" />
+    <meta name="twitter:title" content="CubaStoreRMT" />
     <meta name="twitter:description" content="Calculadora Oficial de Recargas para Río Rise." />
     <meta name="twitter:image" content="https://cubarp-tiendariorise-rmt.netlify.app/cubastore.png" />
 
@@ -405,8 +405,8 @@
                     </div>
 
                     <h1 class="title">
-                        TIENDA RIORISE
-                        <span>RMT-CUBARP</span>
+                        CUBA-STORE
+                        <span>RMT</span>
                     </h1>
                     <p class="subtitle">CALCULADORA OFICIAL DE RECARGAS</p>
                 </div>
@@ -415,16 +415,13 @@
                     🎮 RÍO RISE
                 </div>
 
-                <!-- VENDEDOR INTERCAMBIADO: AHORA POR ENCIMA DE SERVIDOR -->
+                <!-- SELECTOR DE VENDEDORES DINÁMICO -->
                 <div class="form-group">
                     <label for="admin-select">ATENDIDO POR / VENDEDOR:</label>
-                    <select id="admin-select" class="form-control" onchange="updateStockDisplay()">
-                        <option value="5355679191|Jose_Navaza">Jose_Navaza</option>
-                        <option value="5351705159|Roly_Rdiaz">Roly_Rdiaz</option>
-                    </select>
+                    <select id="admin-select" class="form-control" onchange="updateStockDisplay()"></select>
                 </div>
 
-                <!-- SERVIDOR INTERCAMBIADO: AHORA DEBAJO DE VENDEDOR -->
+                <!-- SERVIDOR DEBAJO DE VENDEDOR -->
                 <div class="form-group">
                     <label for="server">SERVIDOR:</label>
                     <select id="server" class="form-control" disabled>
@@ -485,17 +482,11 @@
         
         let currentMode = 'buy';
 
-        // STOCK Y DEMANDA DE REALES POR VENDEDOR
-        const vendorData = {
-            "Jose_Navaza": {
-                stockVenta: 0,
-                comprasDeseadas: 0
-            },
-            "Roly_Rdiaz": {
-                stockVenta: 240000,
-                comprasDeseadas: 0
-            }
-        };
+        // LISTA Y DATOS DE VENDEDORES
+        const vendorsList = [
+            { name: "Jose_Navaza", phone: "5355679191", stockVenta: 0, comprasDeseadas: 0 },
+            { name: "Roly_Rdiaz", phone: "5351705159", stockVenta: 240000, comprasDeseadas: 0 }
+        ];
 
         // Tasas USDT
         const buyRateUSDT = 0.80 / 10000;   
@@ -505,10 +496,38 @@
         const buyRateCUP = 850 / 10000;     
         const sellRateCUP = 600 / 10000;    
 
+        // LLENA Y ORDENA LOS VENDEDORES POR STOCK MAYOR EN EL SELECT
+        function populateAdminSelect() {
+            const adminSelect = document.getElementById('admin-select');
+            
+            // Si el modo es 'buy', ordena por stockVenta de mayor a menor. Si es 'sell', ordena por comprasDeseadas
+            const sortedVendors = [...vendorsList].sort((a, b) => {
+                const stockA = (currentMode === 'buy') ? a.stockVenta : a.comprasDeseadas;
+                const stockB = (currentMode === 'buy') ? b.stockVenta : b.comprasDeseadas;
+                return stockB - stockA;
+            });
+
+            adminSelect.innerHTML = '';
+            sortedVendors.forEach(vendor => {
+                const option = document.createElement('option');
+                option.value = `${vendor.phone}|${vendor.name}`;
+                option.text = vendor.name;
+                adminSelect.appendChild(option);
+            });
+
+            updateStockDisplay();
+        }
+
+        function getSelectedVendorData(vendorName) {
+            return vendorsList.find(v => v.name === vendorName) || { stockVenta: 0, comprasDeseadas: 0 };
+        }
+
         function updateStockDisplay() {
-            const adminSelect = document.getElementById('admin-select').value;
-            const selectedName = adminSelect.split('|')[1];
-            const data = vendorData[selectedName] || { stockVenta: 0, comprasDeseadas: 0 };
+            const adminSelectVal = document.getElementById('admin-select').value;
+            if (!adminSelectVal) return;
+
+            const selectedName = adminSelectVal.split('|')[1];
+            const data = getSelectedVendorData(selectedName);
 
             const labelDisplay = document.getElementById('stock-label-display');
             const amountDisplay = document.getElementById('stock-display');
@@ -552,7 +571,7 @@
                 totalLabel.innerText = 'TOTAL A RECIBIR';
             }
             
-            updateStockDisplay();
+            populateAdminSelect();
             calculateTotal();
         }
 
@@ -598,7 +617,7 @@
             const amount = parseFloat(document.getElementById('amount').value) || 0;
             const payment = document.getElementById('payment').value;
             const totalText = document.getElementById('total-price').innerText;
-            const data = vendorData[selectedName] || { stockVenta: 0, comprasDeseadas: 0 };
+            const data = getSelectedVendorData(selectedName);
 
             if (currentMode === 'buy' && amount > data.stockVenta) {
                 alert(`El vendedor ${selectedName} solo tiene ${data.stockVenta.toLocaleString('es-ES')} REALES disponibles para vender.`);
@@ -619,7 +638,7 @@
                     : 'Por favor, envíame la dirección de la billetera (Red/Network) para efectuar el pago.';
 
                 messageText = `🛒 *NUEVA ORDEN DE COMPRA*\n` +
-                              `🏛️ *Tienda:* TIENDA RIORISE - RMT-CUBARP\n\n` +
+                              `🏛️ *Tienda:* CubaStoreRMT\n\n` +
                               `🎮 *Juego:* ${selectedGame}\n` +
                               `🌐 *Servidor:* ${server}\n` +
                               `👤 *Jugador / ID:* ${playerNameInput}\n` +
@@ -634,7 +653,7 @@
                     : 'Por favor, confírmame para coordinar en el juego y enviarte mi wallet USDT.';
 
                 messageText = `🤝 *NUEVA ORDEN DE VENTA*\n` +
-                              `🏛️ *Tienda:* TIENDA RIORISE - RMT-CUBARP\n\n` +
+                              `🏛️ *Tienda:* CubaStoreRMT\n\n` +
                               `🎮 *Juego:* ${selectedGame}\n` +
                               `🌐 *Servidor:* ${server}\n` +
                               `👤 *Jugador / ID:* ${playerNameInput}\n` +
@@ -649,7 +668,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            updateStockDisplay();
+            populateAdminSelect();
             calculateTotal();
         });
     </script>
