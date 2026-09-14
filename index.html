@@ -140,8 +140,41 @@
             color: var(--text-gray);
             letter-spacing: 2px;
             font-weight: 700;
-            margin-bottom: 22px;
+            margin-bottom: 18px;
             text-transform: uppercase;
+        }
+
+        /* TARJETA DE STOCK GLOBAL EN LA PARTE SUPERIOR */
+        .global-stock-box {
+            background: linear-gradient(135deg, rgba(0, 136, 255, 0.15) 0%, rgba(16, 25, 46, 0.9) 100%);
+            border: 1px solid var(--accent-blue);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 12px rgba(0, 136, 255, 0.2);
+            width: 100%;
+        }
+
+        .global-stock-label {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--text-gray);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .global-stock-amount {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: var(--accent-blue);
+            text-shadow: 0 0 10px var(--accent-blue-glow);
         }
 
         .mode-switch {
@@ -381,7 +414,7 @@
             }
 
             .subtitle {
-                margin-bottom: 28px;
+                margin-bottom: 20px;
             }
 
             .stock-info-box {
@@ -409,6 +442,12 @@
                         <span>RMT</span>
                     </h1>
                     <p class="subtitle">CALCULADORA OFICIAL DE RECARGAS</p>
+                </div>
+
+                <!-- SUMA TOTAL DE STOCK DE TODOS LOS VENDEDORES -->
+                <div class="global-stock-box">
+                    <span class="global-stock-label" id="global-stock-label">STOCK TOTAL TIENDA:</span>
+                    <span class="global-stock-amount" id="global-stock-amount">0 REALES</span>
                 </div>
 
                 <div class="single-info-box">
@@ -482,13 +521,14 @@
         
         let currentMode = 'buy';
 
-        // LISTA Y DATOS DE VENDEDORES
+        // LISTA Y DATOS DE VENDEDORES (Incluye a Eduardoerick_Diasferra)
         const vendorsList = [
-            { name: "Jose_Navaza", phone: "5355679191", stockVenta: 300000, comprasDeseadas: 0 },
-            { name: "Roly_Rdiaz", phone: "5351705159", stockVenta: 100000, comprasDeseadas: 0 }
+            { name: "Jose_Navaza", phone: "5355679191", stockVenta: 330000, comprasDeseadas: 0 },
+            { name: "Roly_Rdiaz", phone: "5351705159", stockVenta: 80000, comprasDeseadas: 0 },
+            { name: "Eduardoerick_Diasferra", phone: "5351447887", stockVenta: 160000, comprasDeseadas: 0 }
         ];
 
-        // Tasas USDT (Modificado buyRateUSDT a 0.70 por cada 10000)
+        // Tasas USDT
         const buyRateUSDT = 0.70 / 10000;   
         const sellRateUSDT = 0.65 / 10000;  
 
@@ -496,11 +536,28 @@
         const buyRateCUP = 850 / 10000;     
         const sellRateCUP = 600 / 10000;    
 
+        // CALCULA Y MUESTRA LA SUMA TOTAL DEL STOCK DE TODOS LOS VENDEDORES
+        function updateGlobalStockDisplay() {
+            const totalStock = vendorsList.reduce((acc, vendor) => {
+                return acc + ((currentMode === 'buy') ? vendor.stockVenta : vendor.comprasDeseadas);
+            }, 0);
+
+            const globalLabel = document.getElementById('global-stock-label');
+            const globalAmount = document.getElementById('global-stock-amount');
+
+            if (currentMode === 'buy') {
+                globalLabel.innerText = 'STOCK TOTAL DISPONIBLE:';
+            } else {
+                globalLabel.innerText = 'TOTAL COMPRANDO TIENDA:';
+            }
+
+            globalAmount.innerText = `${totalStock.toLocaleString('es-ES')} REALES`;
+        }
+
         // LLENA Y ORDENA LOS VENDEDORES POR STOCK MAYOR EN EL SELECT
         function populateAdminSelect() {
             const adminSelect = document.getElementById('admin-select');
             
-            // Si el modo es 'buy', ordena por stockVenta de mayor a menor. Si es 'sell', ordena por comprasDeseadas
             const sortedVendors = [...vendorsList].sort((a, b) => {
                 const stockA = (currentMode === 'buy') ? a.stockVenta : a.comprasDeseadas;
                 const stockB = (currentMode === 'buy') ? b.stockVenta : b.comprasDeseadas;
@@ -516,6 +573,7 @@
             });
 
             updateStockDisplay();
+            updateGlobalStockDisplay();
         }
 
         function getSelectedVendorData(vendorName) {
