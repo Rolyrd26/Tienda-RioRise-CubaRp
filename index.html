@@ -144,7 +144,6 @@
             text-transform: uppercase;
         }
 
-        /* TARJETA DE STOCK GLOBAL EN LA PARTE SUPERIOR */
         .global-stock-box {
             background: linear-gradient(135deg, rgba(0, 136, 255, 0.15) 0%, rgba(16, 25, 46, 0.9) 100%);
             border: 1px solid var(--accent-blue);
@@ -371,6 +370,13 @@
             filter: brightness(1.15);
         }
 
+        .btn-whatsapp:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            filter: none;
+        }
+
         .btn-whatsapp svg {
             width: 22px;
             height: 22px;
@@ -378,7 +384,6 @@
             flex-shrink: 0;
         }
 
-        /* VISTA ESCRITORIO AUTOMÁTICA O POR MODO DE NAVEGADOR */
         @media screen and (min-width: 768px) {
             .container {
                 max-width: 850px !important;
@@ -444,7 +449,6 @@
                     <p class="subtitle">CALCULADORA OFICIAL DE RECARGAS</p>
                 </div>
 
-                <!-- SUMA TOTAL DE STOCK DE TODOS LOS VENDEDORES -->
                 <div class="global-stock-box">
                     <span class="global-stock-label" id="global-stock-label">STOCK TOTAL TIENDA:</span>
                     <span class="global-stock-amount" id="global-stock-amount">0 REALES</span>
@@ -454,18 +458,19 @@
                     🎮 RÍO RISE
                 </div>
 
+                <!-- SERVIDOR DEBAJO DE RÍO RISE -->
+                <div class="form-group">
+                    <label for="server">SERVIDOR:</label>
+                    <select id="server" class="form-control" onchange="populateAdminSelect()">
+                        <option value="LATAM #5">LATAM #5</option>
+                        <option value="LATAM #3">LATAM #3</option>
+                    </select>
+                </div>
+
                 <!-- SELECTOR DE VENDEDORES DINÁMICO -->
                 <div class="form-group">
                     <label for="admin-select">ATENDIDO POR / VENDEDOR:</label>
                     <select id="admin-select" class="form-control" onchange="updateStockDisplay()"></select>
-                </div>
-
-                <!-- SERVIDOR DEBAJO DE VENDEDOR -->
-                <div class="form-group">
-                    <label for="server">SERVIDOR:</label>
-                    <select id="server" class="form-control" disabled>
-                        <option value="LATAM #5">LATAM #5</option>
-                    </select>
                 </div>
 
                 <div class="stock-info-box">
@@ -491,12 +496,10 @@
                     <input type="number" id="amount" class="form-control" value="10000" min="0" step="1000" oninput="calculateTotal()">
                 </div>
 
+                <!-- MÉTODO DE PAGO DINÁMICO SEGÚN EL VENDEDOR -->
                 <div class="form-group">
                     <label for="payment">MÉTODO DE PAGO:</label>
-                    <select id="payment" class="form-control" onchange="calculateTotal()">
-                        <option value="TRANSFERMÓVIL (CUP)">TRANSFERMÓVIL (CUP)</option>
-                        <option value="USDT (CRIPTO)">USDT (CRIPTO)</option>
-                    </select>
+                    <select id="payment" class="form-control" onchange="calculateTotal()"></select>
                 </div>
 
                 <div class="total-box">
@@ -517,28 +520,44 @@
 
     <script>
         const selectedGame = 'RÍO RISE';
-        const server = 'LATAM #5';
         
         let currentMode = 'buy';
 
-        // LISTA Y DATOS DE VENDEDORES (Incluye a Eduardoerick_Diasferra)
+        // METODOS DE PAGO DISPONIBLES POR TIPO
+        const paymentOptionsMap = {
+            cuba: [
+                { value: "TRANSFERMÓVIL (CUP)", label: "TRANSFERMÓVIL (CUP)", currency: "CUP" },
+                { value: "BINANCE (USDT)", label: "BINANCE (USDT)", currency: "USDT" }
+            ],
+            colombia: [
+                { value: "NEQUI (COP)", label: "NEQUI (COP)", currency: "COP" },
+                { value: "BINANCE (USDT)", label: "BINANCE (USDT)", currency: "USDT" }
+            ]
+        };
+
+        // LISTA Y DATOS DE VENDEDORES (Yakko_Yakko asignado a LATAM #3 con métodos de Colombia)
         const vendorsList = [
-            { name: "Jose_Navaza", phone: "5355679191", stockVenta: 330000, comprasDeseadas: 0 },
-            { name: "Roly_Rdiaz", phone: "5351705159", stockVenta: 90000, comprasDeseadas: 0 },
-            { name: "Eduardoerick_Diasferra", phone: "5351447887", stockVenta: 160000, comprasDeseadas: 0 }
+            { name: "Jose_Navaza", phone: "5355679191", stockVenta: 300000, comprasDeseadas: 0, servers: ["LATAM #5"], paymentType: "cuba" },
+            { name: "Roly_Rdiaz", phone: "5351705159", stockVenta: 100000, comprasDeseadas: 0, servers: ["LATAM #5"], paymentType: "cuba" },
+            { name: "Eduardoerick_Diasferra", phone: "5351447887", stockVenta: 0, comprasDeseadas: 0, servers: ["LATAM #5"], paymentType: "cuba" },
+            { name: "Yakko_Yakko", phone: "573002905364", stockVenta: 0, comprasDeseadas: 0, servers: ["LATAM #3"], paymentType: "colombia" }
         ];
 
-        // Tasas USDT
-        const buyRateUSDT = 0.70 / 10000;   
-        const sellRateUSDT = 0.65 / 10000;  
+        // Tasas por divisa (Compra / Venta por 10.000 Reales)
+        const rates = {
+            USDT: { buy: 0.70 / 10000, sell: 0.65 / 10000 },
+            CUP:  { buy: 850 / 10000,  sell: 600 / 10000 },
+            COP:  { buy: 2300 / 10000, sell: 2500 / 10000 } // Ajustar tasa COP si lo deseas
+        };
 
-        // Tasas CUP
-        const buyRateCUP = 850 / 10000;     
-        const sellRateCUP = 600 / 10000;    
+        function getAvailableVendors() {
+            const selectedServer = document.getElementById('server').value;
+            return vendorsList.filter(v => v.servers.includes(selectedServer));
+        }
 
-        // CALCULA Y MUESTRA LA SUMA TOTAL DEL STOCK DE TODOS LOS VENDEDORES
         function updateGlobalStockDisplay() {
-            const totalStock = vendorsList.reduce((acc, vendor) => {
+            const activeVendors = getAvailableVendors();
+            const totalStock = activeVendors.reduce((acc, vendor) => {
                 return acc + ((currentMode === 'buy') ? vendor.stockVenta : vendor.comprasDeseadas);
             }, 0);
 
@@ -554,41 +573,78 @@
             globalAmount.innerText = `${totalStock.toLocaleString('es-ES')} REALES`;
         }
 
-        // LLENA Y ORDENA LOS VENDEDORES POR STOCK MAYOR EN EL SELECT
         function populateAdminSelect() {
             const adminSelect = document.getElementById('admin-select');
-            
-            const sortedVendors = [...vendorsList].sort((a, b) => {
-                const stockA = (currentMode === 'buy') ? a.stockVenta : a.comprasDeseadas;
-                const stockB = (currentMode === 'buy') ? b.stockVenta : b.comprasDeseadas;
-                return stockB - stockA;
-            });
+            const activeVendors = getAvailableVendors();
+            const btnAction = document.getElementById('btn-action');
 
-            adminSelect.innerHTML = '';
-            sortedVendors.forEach(vendor => {
-                const option = document.createElement('option');
-                option.value = `${vendor.phone}|${vendor.name}`;
-                option.text = vendor.name;
-                adminSelect.appendChild(option);
-            });
+            if (activeVendors.length === 0) {
+                adminSelect.innerHTML = '<option value="">SIN VENDEDORES DISPONIBLES</option>';
+                adminSelect.disabled = true;
+                btnAction.disabled = true;
+            } else {
+                adminSelect.disabled = false;
+                btnAction.disabled = false;
+                
+                const sortedVendors = [...activeVendors].sort((a, b) => {
+                    const stockA = (currentMode === 'buy') ? a.stockVenta : a.comprasDeseadas;
+                    const stockB = (currentMode === 'buy') ? b.stockVenta : b.comprasDeseadas;
+                    return stockB - stockA;
+                });
+
+                adminSelect.innerHTML = '';
+                sortedVendors.forEach(vendor => {
+                    const option = document.createElement('option');
+                    option.value = `${vendor.phone}|${vendor.name}`;
+                    option.text = vendor.name;
+                    adminSelect.appendChild(option);
+                });
+            }
 
             updateStockDisplay();
             updateGlobalStockDisplay();
         }
 
         function getSelectedVendorData(vendorName) {
-            return vendorsList.find(v => v.name === vendorName) || { stockVenta: 0, comprasDeseadas: 0 };
+            return vendorsList.find(v => v.name === vendorName) || { stockVenta: 0, comprasDeseadas: 0, paymentType: "cuba" };
+        }
+
+        function updatePaymentMethods() {
+            const adminSelect = document.getElementById('admin-select');
+            const paymentSelect = document.getElementById('payment');
+            paymentSelect.innerHTML = '';
+
+            if (!adminSelect.value) return;
+
+            const selectedName = adminSelect.value.split('|')[1];
+            const vendor = getSelectedVendorData(selectedName);
+            const options = paymentOptionsMap[vendor.paymentType] || paymentOptionsMap.cuba;
+
+            options.forEach(opt => {
+                const optionEl = document.createElement('option');
+                optionEl.value = opt.value;
+                optionEl.dataset.currency = opt.currency;
+                optionEl.text = opt.label;
+                paymentSelect.appendChild(optionEl);
+            });
+
+            calculateTotal();
         }
 
         function updateStockDisplay() {
-            const adminSelectVal = document.getElementById('admin-select').value;
-            if (!adminSelectVal) return;
-
-            const selectedName = adminSelectVal.split('|')[1];
-            const data = getSelectedVendorData(selectedName);
-
+            const adminSelect = document.getElementById('admin-select');
             const labelDisplay = document.getElementById('stock-label-display');
             const amountDisplay = document.getElementById('stock-display');
+
+            if (!adminSelect.value) {
+                labelDisplay.innerText = 'Disponibles en Stock:';
+                amountDisplay.innerText = '0 REALES';
+                updatePaymentMethods();
+                return;
+            }
+
+            const selectedName = adminSelect.value.split('|')[1];
+            const data = getSelectedVendorData(selectedName);
 
             if (currentMode === 'buy') {
                 labelDisplay.innerText = 'Disponibles en Stock:';
@@ -597,6 +653,8 @@
                 labelDisplay.innerText = 'Comprando hasta:';
                 amountDisplay.innerText = `${data.comprasDeseadas.toLocaleString('es-ES')} REALES`;
             }
+
+            updatePaymentMethods();
         }
 
         function setMode(mode) {
@@ -636,20 +694,16 @@
         function calculateTotal() {
             const amountInput = document.getElementById('amount').value;
             const amount = parseFloat(amountInput) || 0;
-            const paymentMethod = document.getElementById('payment').value;
+            const paymentSelect = document.getElementById('payment');
             
-            let total = 0;
-            let currencySymbol = 'USDT';
+            if (!paymentSelect || !paymentSelect.selectedOptions[0]) return;
 
-            if (paymentMethod.includes('CUP')) {
-                const activeRate = (currentMode === 'buy') ? buyRateCUP : sellRateCUP;
-                total = amount * activeRate;
-                currencySymbol = 'CUP';
-            } else {
-                const activeRate = (currentMode === 'buy') ? buyRateUSDT : sellRateUSDT;
-                total = amount * activeRate;
-                currencySymbol = 'USDT';
-            }
+            const selectedOption = paymentSelect.selectedOptions[0];
+            const currencySymbol = selectedOption.dataset.currency || 'USDT';
+            
+            const rateObj = rates[currencySymbol] || rates.USDT;
+            const activeRate = (currentMode === 'buy') ? rateObj.buy : rateObj.sell;
+            const total = amount * activeRate;
 
             const formattedTotal = (currencySymbol === 'USDT') 
                 ? total.toFixed(2).replace('.', ',') 
@@ -668,6 +722,12 @@
             }
 
             const adminSelect = document.getElementById('admin-select').value;
+            if (!adminSelect) {
+                alert('No hay ningún vendedor seleccionado o disponible en este servidor.');
+                return;
+            }
+
+            const serverSelected = document.getElementById('server').value;
             const adminData = adminSelect.split('|');
             const selectedPhone = adminData[0];
             const selectedName = adminData[1];
@@ -690,35 +750,25 @@
             let messageText = '';
 
             if (currentMode === 'buy') {
-                const metodoPago = payment.includes('CUP') ? 'Transfermóvil (CUP)' : 'USDT (Cripto)';
-                const detallePago = payment.includes('CUP') 
-                    ? 'Por favor, facilítame el número de tarjeta/teléfono para realizar la transferencia.' 
-                    : 'Por favor, envíame la dirección de la billetera (Red/Network) para efectuar el pago.';
-
                 messageText = `🛒 *NUEVA ORDEN DE COMPRA*\n` +
                               `🏛️ *Tienda:* CubaStoreRMT\n\n` +
                               `🎮 *Juego:* ${selectedGame}\n` +
-                              `🌐 *Servidor:* ${server}\n` +
+                              `🌐 *Servidor:* ${serverSelected}\n` +
                               `👤 *Jugador / ID:* ${playerNameInput}\n` +
                               `💎 *Cantidad a Comprar:* ${amount} REALES\n` +
-                              `💳 *Método de Pago:* ${metodoPago}\n` +
+                              `💳 *Método de Pago:* ${payment}\n` +
                               `💰 *Total a pagar:* ${totalText}\n\n` +
-                              `Hola *${selectedName}*, ${detallePago}`;
+                              `Hola *${selectedName}*, quedo a la espera de los datos de pago para realizar la transferencia.`;
             } else {
-                const metodoCobro = payment.includes('CUP') ? 'Transfermóvil (CUP)' : 'USDT (Cripto)';
-                const detalleCobro = payment.includes('CUP') 
-                    ? 'Por favor, confírmame para coordinar en el juego y enviarte mi tarjeta.' 
-                    : 'Por favor, confírmame para coordinar en el juego y enviarte mi wallet USDT.';
-
                 messageText = `🤝 *NUEVA ORDEN DE VENTA*\n` +
                               `🏛️ *Tienda:* CubaStoreRMT\n\n` +
                               `🎮 *Juego:* ${selectedGame}\n` +
-                              `🌐 *Servidor:* ${server}\n` +
+                              `🌐 *Servidor:* ${serverSelected}\n` +
                               `👤 *Jugador / ID:* ${playerNameInput}\n` +
                               `💎 *Cantidad a Vender:* ${amount} REALES\n` +
-                              `💳 *Método de Cobro:* ${metodoCobro}\n` +
+                              `💳 *Método de Cobro:* ${payment}\n` +
                               `💰 *Total a recibir:* ${totalText}\n\n` +
-                              `Hola *${selectedName}*, ${detalleCobro}`;
+                              `Hola *${selectedName}*, confírmame para coordinar en el juego y enviarte mis datos.`;
             }
 
             const encodedMessage = encodeURIComponent(messageText);
